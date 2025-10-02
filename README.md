@@ -1,4 +1,4 @@
-# Prittier Process - PpsX
+# Prettier Process - PpsX
 
 **PpsX** is a Rust command-line tool to explore and monitor Linux processes in a clean and readable way.
 It supports both text and JSON output formats and includes a live monitoring mode.
