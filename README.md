@@ -1,3 +1,5 @@
+![ ](PpsX_logo.png)
+
 # Prettier Process - PpsX
 
 **PpsX** is a Rust command-line tool to explore and monitor Linux processes in a clean and readable way.
