@@ -1,6 +1,15 @@
 use crate::proc::{read_info, ProcessInfo};
 use std::fs;
 
+/*
+------------------------------------------------------------------------------------------------------------------------
+Function statistics:    -input:         options as boleans
+                        -output:        Result type (did it succed or not)
+                        -description:   get all processes (ProcessInfo) public informations (with read_info) and
+                                        push them in a vector; then compute generals information and display the
+                                        result depending on the options
+------------------------------------------------------------------------------------------------------------------------
+*/
 pub fn statistics(json: bool, file: bool)-> Result<(), Box<dyn std::error::Error>>{
     let mut pids: Vec<ProcessInfo> = Vec::new();
 

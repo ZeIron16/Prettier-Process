@@ -6,7 +6,13 @@ use libc::{sysconf, _SC_CLK_TCK};
 use chrono::Local;
 use crate::proc::{read_info};
 
-
+/*
+------------------------------------------------------------------------------------------------------------------------
+Function get_cpu_info:  -input:         a pid
+                        -output:        the cpu usage for the given process
+                        -description:   read cpu information in "/proc/{}/stat" and return it
+------------------------------------------------------------------------------------------------------------------------
+*/
 fn get_cpu_info(pid: usize)-> Result<u64, io::Error>{
     let content = fs::read_to_string(format!("/proc/{}/stat", pid))?;
     let split: Vec<&str> = content.split_whitespace().collect();
@@ -17,6 +23,14 @@ fn get_cpu_info(pid: usize)-> Result<u64, io::Error>{
     Ok(total)
 }
 
+/*
+------------------------------------------------------------------------------------------------------------------------
+Function start: -input:         a pid and option as bolean (json)
+                -output:        Result type (did it succed or not)
+                -description:   start the live monitoring of the given process by reading its information (read_info)
+                                every second and displaying the result depending on the option
+------------------------------------------------------------------------------------------------------------------------
+*/
 pub fn start(pid: usize, json: bool)-> Result<(), Box<dyn std::error::Error>>{
     let mut prev_cpu = get_cpu_info(pid)?;
     let mut time = std::time::Instant::now();

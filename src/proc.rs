@@ -6,7 +6,7 @@ use std::io;
 struct Process {
     pid: usize,
     name: String,
-}
+} // Used for list
 
 #[derive(Serialize)]
 pub struct ProcessInfo {
@@ -20,8 +20,16 @@ pub struct ProcessInfo {
     pub vm_size: usize,
     pub vm_rss: usize,
     cmdline: String,
-}
+} // Used for the other commands
 
+/*
+------------------------------------------------------------------------------------------------------------------------
+Function read_info: -input:         a process id
+                    -output:        a ProcessInfo containing information about this process if they are getable; an Error else
+                    -description:   read information about this process (if it exist) through /proc/{PID}/comm
+                                    and split it in the different "slots" of a new ProcessInfo
+------------------------------------------------------------------------------------------------------------------------
+*/
 pub fn read_info(pid: usize) -> Result<ProcessInfo, io::Error> {
     let content = format!("/proc/{}/comm", pid);
     let name = fs::read_to_string(content)?.trim().to_string();
@@ -53,6 +61,14 @@ pub fn read_info(pid: usize) -> Result<ProcessInfo, io::Error> {
     Ok(ProcessInfo{pid, name, state, ppid, uid, gid, threads, vm_size, vm_rss, cmdline,})
 }
 
+/*
+------------------------------------------------------------------------------------------------------------------------
+Function get_pids_info: -input:         /
+                        -output:        a vector of "Process" containing the pid and name of all process
+                        -description:   get the pid of all processes (with "/proc") then for every process,
+                                        find is name in "/proc/{PID}/comm" and push both information in a vector 
+------------------------------------------------------------------------------------------------------------------------
+*/
 fn get_pids_info() -> Result<Vec<Process>, io::Error> {
     let mut pids: Vec<Process> = Vec::new();
 
@@ -75,6 +91,13 @@ fn get_pids_info() -> Result<Vec<Process>, io::Error> {
     Ok(pids)
 }
 
+/*
+------------------------------------------------------------------------------------------------------------------------
+Function list_proc: -input:         options as booleans (json and file)
+                    -output:        Result type (did it succed or not)
+                    -description:   call get_pids_info and display the result dependig on the options
+------------------------------------------------------------------------------------------------------------------------
+*/
 pub fn list_proc(json: bool, file: bool) -> Result<(), Box<dyn std::error::Error>> {
     let proc = match get_pids_info() {
         Ok(p) => p,
@@ -112,6 +135,14 @@ pub fn list_proc(json: bool, file: bool) -> Result<(), Box<dyn std::error::Error
     Ok(())
 }
 
+/*
+------------------------------------------------------------------------------------------------------------------------
+Function pinfo: -input:         pid of the wanted process and options as booleans (json and file)
+                -output:        Result type (did it succed or not)
+                -description:   call get_pids_info to check if the wanted process exist, then call read_info on
+                                its pid and display the result depending on the options
+------------------------------------------------------------------------------------------------------------------------
+*/
 pub fn pinfo(pid: usize, json: bool, file: bool) -> Result<(), Box<dyn std::error::Error>> {
     let proc = match get_pids_info() {
         Ok(p) => p,

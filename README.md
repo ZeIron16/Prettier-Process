@@ -19,11 +19,13 @@ Track a process in real-time.
 
 ## Installation
 
+**Make sure you have Rust**
+
 - Install the files. (`git clone https://github.com/ZeIron16/Prettier-Process_PpsX.git`)
 
 - You would then be able to use the commands from target/release/ppsx.
 
-- You need Rust. In the main directory, use: `cargo build --release`
+- In the main directory, use: `cargo build --release`
 
 - Then you can simply use: `cargo install --path`
 
