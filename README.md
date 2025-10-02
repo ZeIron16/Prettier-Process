@@ -34,7 +34,7 @@ Track a process in real-time.
 | Command | Description | Options |
 |---------|-------------|---------|
 | `list` | List all processes | `--json` for JSON output<br>`--file` to save to file in the current directory|
-| `exepid <PID>` | Details of a specific process | `--json` for JSON output<br> `--file` to save to file in the current directory|
+| `pinfo <PID>` | Details of a specific process | `--json` for JSON output<br> `--file` to save to file in the current directory|
 | `stats` | System-wide process statistics | `--json` for JSON output<br>`--file` to save to file in the current directory|
 | `live <PID>` | Real-time process monitoring | `--json` for JSON output<br>|
 
