@@ -16,7 +16,6 @@ macro_rules! pub_struct {
     }
 }
 
-
 pub_struct!(Process{
     pid: usize,
     name: String,
