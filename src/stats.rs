@@ -1,4 +1,5 @@
-use crate::proc::{read_info, ProcessInfo};
+use crate::struct_proc as sp;
+use crate::proc::{read_info};
 use std::fs;
 
 /*
@@ -11,7 +12,7 @@ Function statistics:    -input:         options as boleans
 ------------------------------------------------------------------------------------------------------------------------
 */
 pub fn statistics(json: bool, file: bool)-> Result<(), Box<dyn std::error::Error>>{
-    let mut pids: Vec<ProcessInfo> = Vec::new();
+    let mut pids: Vec<sp::ProcessInfo> = Vec::new();
 
     let contents = fs::read_dir("/proc")?;
 

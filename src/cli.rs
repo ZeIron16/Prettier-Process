@@ -10,7 +10,7 @@ enum ComList {
     List {#[arg(long)]json: bool, #[arg(long)]file: bool},
     Stats {#[arg(long)]json: bool, #[arg(long)]file: bool},
     Live {pid: usize, #[arg(long)]json: bool},
-    Pinfo {pid: usize, #[arg(long)]json: bool, #[arg(long)]file: bool},
+    Pinfo {pid: usize, #[arg(long)]json: bool, #[arg(long)]file: bool, #[arg(long)]all: bool},
 } // Describes the command list and their arguments 
 
 #[derive(Parser)]
@@ -29,7 +29,7 @@ Function handler:   -input:         a command line (allready parsed)
 pub fn handler(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
     match cli.command {
         ComList::List { json, file} => proc::list_proc(json, file),
-        ComList::Pinfo { pid, json, file} => proc::pinfo(pid, json, file),
+        ComList::Pinfo { pid, json, file, all} => proc::pinfo(pid, json, file, all),
         ComList::Stats { json, file } => stats::statistics(json, file),
         ComList::Live { pid, json } => live::start(pid, json),
     }
