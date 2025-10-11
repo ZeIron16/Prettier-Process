@@ -3,7 +3,7 @@
 A collection of Rust projects and experiments to practice and explore the Rust programming language.
 
 ## About
-This repository contains various small to medium Rust projects aimed at learning and experimenting with Rust concepts, libraries, and programming techniques. Each project is self-contained and focuses on a particular aspect of Rust programming.
+This repository contains various small to medium Rust projects aimed at learning and experimenting with Rust concepts, libraries, and programming techniques.
 
 ## Projects
 - Prettier-Process (PpsX): PpsX is a Rust command-line tool to explore and monitor Linux processes in a clean and readable way. It supports both text and JSON output formats and includes a live monitoring mode.
