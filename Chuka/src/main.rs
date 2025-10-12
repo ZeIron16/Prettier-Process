@@ -6,4 +6,3 @@ mod comp;
 fn main() {
     display::shell();
 }
-

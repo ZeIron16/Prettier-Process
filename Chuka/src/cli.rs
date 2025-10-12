@@ -1,4 +1,6 @@
 use clap::{Command, Arg, ArgMatches, ArgAction};
+use std::sync::mpsc;
+
 use crate::display::MyApp;
 use crate::dwn;
 use crate::comp;
@@ -86,7 +88,16 @@ pub fn handle_command(matches: ArgMatches, app_state: &mut MyApp) -> Result<Stri
             let url = args.get_one::<String>("url").unwrap();
             let output = args.get_one::<String>("output");
             let audio = args.get_flag("audio");
-            dwn::download(url, audio, output)
+            
+            let (tx, rx) = mpsc::channel::<f32>();
+            app_state.download_rx = Some(rx);
+            app_state.downloading = true;
+            app_state.download_progress = 0.0;
+
+            match dwn::download(url, audio, output, tx) {
+                Ok(()) => Ok("Downloading ...".to_string()),
+                Err(e) => Ok(format!("Failed to start download: {e}"))
+            }
         }
         Some(("compress", args)) => {
             let input = args.get_one::<String>("input").unwrap();

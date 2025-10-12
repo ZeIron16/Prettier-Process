@@ -1,5 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
+use std::io::{BufRead, BufReader, Read};
+use std::thread;
+use std::sync::mpsc::Sender;
 use std::process::{Command as ProcessCommand, Stdio};
 
 #[cfg(target_os = "linux")]
@@ -31,16 +34,22 @@ fn prepare_binary() -> Result<PathBuf, Box<dyn std::error::Error>> {
     Ok(ytdlp_path)
 }
 
-pub fn download(
-    url: &str,
-    audio_only: bool,
-    output_file: Option<&String>,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let ytdlp_path = match prepare_binary() {
-        Ok(path) => path,
-        Err(e) => return Ok(format!("Error while extracting yt-dlp: {}", e)),
-    };
+fn read_progress<R: Read + Send + 'static>(pipe: R, tx: Sender<f32>) {
+    thread::spawn(move || {
+        let reader = BufReader::new(pipe);
+        for line in reader.lines().flatten() {
+            if let Some(percent_token) = line.split_whitespace().find(|s| s.ends_with('%')) {
+                let number = percent_token.trim_end_matches('%').replace(',', ".");
+                if let Ok(val) = number.parse::<f32>() {
+                    let _ = tx.send(val);
+                }
+            }
+        }
+    });
+}
 
+pub fn download(url: &str, audio_only: bool, output_file: Option<&String>, progress_tx: Sender<f32>) -> Result<(), Box<dyn std::error::Error>> {
+    let ytdlp_path = prepare_binary()?;
     let mut cmd = ProcessCommand::new(&ytdlp_path);
 
     if audio_only {
@@ -57,18 +66,26 @@ pub fn download(
         cmd.arg("-o").arg("%(title)s.%(ext)s");
     }
 
-    cmd.arg(url).stdout(Stdio::null()).stderr(Stdio::null());
+    cmd.arg("--newline").arg("--no-color");
+    cmd.arg(url);
 
     cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
 
-    match cmd.status() {
-        Ok(status) => {
-            if status.success() {
-                Ok("Download finished successfully!".to_string())
-            } else {
-                Ok(format!("Download failed (exit code: {:?})", status.code()))
-            }
-        }
-        Err(e) => Ok(format!("Execution error: {}", e)),
+    let mut child = cmd.spawn()?;
+
+    if let Some(stdout) = child.stdout.take() {
+        read_progress(stdout, progress_tx.clone());
     }
+
+    if let Some(stderr) = child.stderr.take() {
+        read_progress(stderr, progress_tx.clone());
+    }
+
+    let tx_final = progress_tx.clone();
+    thread::spawn(move || {
+        let _ = child.wait();
+        let _ = tx_final.send(100.0);
+    });
+
+    Ok(())
 }
